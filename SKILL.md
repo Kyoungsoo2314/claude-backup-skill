@@ -79,14 +79,25 @@ After execution, report to user:
 
 ```
 claude-backup/
-├── _SUMMARY.md                 # Overview of all projects
+├── _SUMMARY.md                        # Overview of all projects
 ├── my-project/
-│   ├── _INDEX.md               # Project session list (Obsidian wikilinks)
-│   ├── 2025-01-10_a1b2c3d4.md  # Session file
-│   └── 2025-01-11_e5f6g7h8.md
+│   ├── _INDEX.md                      # Project session list (Obsidian wikilinks)
+│   ├── 2025-01-10_Implement login.md  # Session file (title from first message)
+│   └── 2025-01-11_Fix bug in API.md
 └── another-project/
     └── ...
 ```
+
+### Filename Format
+
+Session filenames are auto-generated from the first user message:
+
+| First Message | Filename |
+|---------------|----------|
+| "Implement login feature" | `2025-01-10_Implement login feature.md` |
+| `https://github.com/user/repo` | `2025-01-10_GitHub repo.md` |
+| `C:\path\to\file.py` | `2025-01-10_file.md` |
+| (command only) | `2025-01-10_a1b2c3d4.md` (fallback to session ID) |
 
 ## Session File Format
 
