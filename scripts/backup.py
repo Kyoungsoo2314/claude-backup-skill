@@ -52,6 +52,54 @@ def sanitize_name(name):
     return re.sub(r'[<>:"/\\|?*]', '', name).strip()[:60]
 
 
+def extract_session_title(messages, max_length=30):
+    """Extract meaningful title from first user message"""
+    for msg in messages:
+        # Find first user message
+        if msg.get('type') == 'user' or msg.get('message', {}).get('role') == 'user':
+            content = msg.get('message', {}).get('content', '')
+
+            # Extract text from content
+            if isinstance(content, str):
+                text = content
+            elif isinstance(content, list):
+                text = ' '.join(
+                    item.get('text', '') for item in content
+                    if isinstance(item, dict) and item.get('type') == 'text'
+                )
+            else:
+                continue
+
+            # Skip command messages
+            if text.startswith(('<', '/')):
+                continue
+
+            # Clean up the text
+            text = text.strip()
+            if not text:
+                continue
+
+            # Remove special characters for filename
+            text = re.sub(r'[<>:"/\\|?*\n\r\t]', ' ', text)
+            text = re.sub(r'\s+', ' ', text).strip()
+
+            # Extract meaningful part (first line or sentence)
+            text = text.split('.')[0].split('?')[0].split('!')[0]
+            text = text.strip()
+
+            # Truncate to max length
+            if len(text) > max_length:
+                # Try to cut at word boundary
+                text = text[:max_length].rsplit(' ', 1)[0]
+                if len(text) < 10:  # If too short, just truncate
+                    text = text[:max_length]
+
+            if len(text) >= 3:  # Minimum 3 characters
+                return text
+
+    return None
+
+
 def load_session(filepath):
     """Load session file"""
     messages = []
@@ -237,7 +285,13 @@ def process_sessions(projects_dir, output_dir, incremental=False, silent=False):
                 project_out = output_dir / project_name
                 project_out.mkdir(parents=True, exist_ok=True)
 
-                filename = f"{first_ts.strftime('%Y-%m-%d')}_{session_file.stem[:8]}.md"
+                # Generate filename with title
+                date_str = first_ts.strftime('%Y-%m-%d')
+                title = extract_session_title(messages)
+                if title:
+                    filename = f"{date_str}_{title}.md"
+                else:
+                    filename = f"{date_str}_{session_file.stem[:8]}.md"
                 out_file = project_out / filename
 
                 # Skip existing in incremental mode

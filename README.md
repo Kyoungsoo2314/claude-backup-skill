@@ -50,11 +50,15 @@ claude-backup/
 ├── _SUMMARY.md                 # Overview
 ├── my-project/
 │   ├── _INDEX.md               # Session list (Obsidian wikilinks)
-│   ├── 2025-01-10_a1b2c3d4.md
-│   └── 2025-01-11_e5f6g7h8.md
+│   ├── 2025-01-10_백업스킬개발.md      # Auto-generated title from first message
+│   └── 2025-01-11_버그수정요청.md
 └── another-project/
     └── ...
 ```
+
+**Filename format**: `YYYY-MM-DD_제목.md`
+- Title is extracted from the first user message
+- Falls back to session ID if no valid title found
 
 ## Output Format
 
